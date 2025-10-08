@@ -20,10 +20,10 @@ OUTPUT_DIR = "titanic_test"
 PORT=8137
 
 CLUSTER = "pace-ice"
-LLM_MODEL = 'llama3.3'
+LLM_MODEL = 'gemini' # change to llama3.3 for local development
 ENVIRONMENT_DIR = os.path.join(ROOT_DIR, ".venv")
 SLURM_CONFIG_DIR = os.path.join(ROOT_DIR, "slurm-config/")
-LOCAL_LLM = True
+LOCAL_LLM = False # change to True for local development
 HOSTNAME_DIR = os.path.join(ROOT_DIR, "hostname.log")
 
 QC_CHECK_BOOL = False

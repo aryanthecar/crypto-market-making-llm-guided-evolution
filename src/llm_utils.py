@@ -403,7 +403,7 @@ def submit_gemini_api(txt2gemini, **kwargs):
     str
         Model's output from inference
     """   
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "INSERT_KEY_HERE_FOR_LOCAL_USE")
     
     client = genai.Client(api_key=GEMINI_API_KEY)
     response = client.models.generate_content(

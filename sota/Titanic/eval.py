@@ -13,6 +13,11 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import random
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 def create_save_dir(save_root):
     if not p(save_root).exists():
@@ -48,6 +53,7 @@ def get_args():
 
 
 if __name__ == '__main__':
+    logger.info(f"Starting evaluation")
     script_directory = p(__file__).parent.resolve()
     os.chdir(script_directory)
 
@@ -76,13 +82,14 @@ if __name__ == '__main__':
     train_df = pd.read_csv('data/processed_train.csv')
     X = train_df.drop("Survived", axis=1)
     y = train_df["Survived"]
-
+    logger.info(f"Data loaded successfully")
     X_train, X_val, y_train, y_val = train_test_split(
     X, y, test_size=0.2, random_state=0)
-
+    logger.info(f"Data split successfully")
     model = model_module.Model()
     model.fit(X_train, y_train)
     predictions = model.predict(X_val)
+    logger.info(f"Model trained successfully")
 
 
     matrix = sklearn.metrics.confusion_matrix(y_val, predictions)
