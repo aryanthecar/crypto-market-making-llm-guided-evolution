@@ -20,3 +20,4 @@ output/
 **/results/
 **/llmge_models/
 slurm-*.out
+**/trained/

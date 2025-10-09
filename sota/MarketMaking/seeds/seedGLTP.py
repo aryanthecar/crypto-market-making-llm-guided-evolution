@@ -83,6 +83,7 @@ def glft_market_maker(hbt, recorder):
 
     # Checks every 100 milliseconds.
     while hbt.elapse(100_000_000) == 0:
+        depth = hbt.depth(0)
         #--------------------------------------------------------
         # Records market order's arrival depth from the mid-price.
         if not np.isnan(mid_price_tick):
@@ -105,7 +106,6 @@ def glft_market_maker(hbt, recorder):
 
         best_bid_tick = depth.best_bid_tick
         best_ask_tick = depth.best_ask_tick
-
         prev_mid_price_tick = mid_price_tick
         mid_price_tick = (best_bid_tick + best_ask_tick) / 2.0
 
@@ -169,12 +169,10 @@ def glft_market_maker(hbt, recorder):
         if position < max_position and np.isfinite(bid_price):
             bid_price_as_order_id = round(bid_price / tick_size)
             if bid_price_as_order_id not in orders:
-                print(f"Submitting buy order at {bid_price}")
                 hbt.submit_buy_order(0, bid_price_as_order_id, bid_price, order_qty, GTX, LIMIT, False)
         if position > -max_position and np.isfinite(ask_price):
             ask_price_as_order_id = round(ask_price / tick_size)
             if ask_price_as_order_id not in orders:
-                print(f"Submitting sell order at {ask_price}")
                 hbt.submit_sell_order(0, ask_price_as_order_id, ask_price, order_qty, GTX, LIMIT, False)
 
         #--------------------------------------------------------

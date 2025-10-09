@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 # Data files (7 days of Bitcoin data)
 DATA_FILES = [
-    'exampleData/btcusdt_20200201.npz',
+    'data/btcusdt_20200201.npz',
 ]
 
 # Initial snapshot (optional but recommended for continuity)
@@ -85,19 +85,19 @@ def calculate_fitness(stats, roi_weight=ROI_WEIGHT, sharpe_weight=SHARPE_WEIGHT)
     # stats.entire is a Polars DataFrame with columns: 
     # start, end, SR (Sharpe), Sortino, Return, MaxDrawdown, Daily, 
     # NumberOfTrades, DailyTurnover, ReturnOverMDD, ReturnOverTrade, MaxPositionValue
-    entire_stats = stats.entire
-    
-    # Get the first row (should only be one row for entire period stats)
+    entire_stats = stats.summary()
+    print(type(entire_stats))
+    # # Get the first row (should only be one row for entire period stats)
     row = entire_stats.row(0, named=True)
-    
+    print(row)
     # Extract metrics
     # Return is already in percentage form from the stats
-    print(row)
+
     roi = row['Return']  # This is the total return in percentage
     sharpe = row['SR']  # Sharpe Ratio
     max_drawdown = abs(row['MaxDrawdown'])  # Make positive for display
     sortino = row['Sortino']
-    total_trades = row['NumberOfTrades']
+    total_trades = row['DailyNumberOfTrades']
     return_over_mdd = row['ReturnOverMDD']
     return_over_trade = row['ReturnOverTrade']
     max_position_value = row['MaxPositionValue']
@@ -205,6 +205,7 @@ def main():
         .trading_value_fee_model(MAKER_FEE, TAKER_FEE)
         .tick_size(TICK_SIZE)
         .lot_size(LOT_SIZE)
+        .last_trades_capacity(1000) 
         .roi_lb(0.0)  # Lower bound of price range of interest
         .roi_ub(100000.0)  # Upper bound (adjust for BTC price range)
     )
@@ -245,9 +246,10 @@ def main():
     # Close backtest
     logger.info("Backtest complete, processing results...")
     hbt.close()
+
     logger.info("Congrats your model has passed the sanity check!")
-    sys.exit(0)
-    
+    # sys.exit(0)
+
 
     # Get recorded data and calculate statistics
     recorded_data = recorder.get(0)  # Get data for asset 0
@@ -256,10 +258,9 @@ def main():
     # book_size is the position size used for calculating various metrics
     stats = LinearAssetRecord(recorded_data).stats(book_size=INITIAL_BALANCE)
     stats1 = LinearAssetRecord(recorder.get(0)).stats(book_size=INITIAL_BALANCE)
-    # print(stats1.summary())
-    
+    # sys.exit(0)
     # Calculate fitness
-    #fitness, metrics = calculate_fitness(stats)
+    fitness, metrics = calculate_fitness(stats)
     
     # Replace the logger.info section with:
     logger.info("="*80)
