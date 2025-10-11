@@ -404,7 +404,8 @@ def submit_gemini_api(txt2gemini, **kwargs):
         Model's output from inference
     """   
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "INSERT_KEY_HERE_FOR_LOCAL_USE")
-    
+    # add 10 second delay for rate limiting
+    time.sleep(5)
     client = genai.Client(api_key=GEMINI_API_KEY)
     response = client.models.generate_content(
         model="gemini-2.0-flash",
