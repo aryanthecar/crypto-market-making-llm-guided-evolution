@@ -58,6 +58,7 @@ def optimal_deltas(t, S, q, X, lam_buy, lam_sell, k_buy, k_sell, alpha,
     delta_buy = d0_buy + B_buy * (E_alpha + phi * (dir_buy + inv_term_buy))
     return max(0.0, delta_sell), max(0.0, delta_buy)
 
+# --OPTION--
 @njit
 def cjr_market_maker(hbt, recorder):
     tick_size = hbt.depth(0).tick_size

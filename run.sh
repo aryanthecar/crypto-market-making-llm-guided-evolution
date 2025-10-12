@@ -9,4 +9,4 @@ hostname
 module load uv
 
 export SERVER_HOSTNAME=$(hostname)
-uv run python run_improved.py titanic_test
+uv run python run_improved.py marketMaking_test

@@ -13,7 +13,7 @@ out_dtype = np.dtype([
     ('position', 'f8')
 ])
 
-
+# --OPTION--
 @njit
 def obi_mm(hbt, stat, half_spread, skew, c1, looking_depth, interval, window, order_qty_dollar, max_position_dollar, grid_num, grid_interval, roi_lb, roi_ub):
     """
@@ -130,7 +130,7 @@ def obi_mm(hbt, stat, half_spread, skew, c1, looking_depth, interval, window, or
         # Records the current state for stat calculation.
         stat.record(hbt)
 
-
+# --OPTION--
 # Order Book Imbalance (OBI) Market Making Strategy
 class Model:
     """

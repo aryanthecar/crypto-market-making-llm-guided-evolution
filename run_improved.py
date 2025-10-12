@@ -414,10 +414,9 @@ def check4results(gene_id):
         with open(results_path, 'r') as file:
             results = file.read()
         results = results.split(',')
-        fitness = [float(r.strip()) for r in results]
-        # TODO: get all features later
-        fitness = [fitness[0], fitness[1]]
+        fitness = [float(results[0].strip())]  # Only take first value
         fitness = tuple(fitness)
+
         
         GLOBAL_DATA[gene_id]['status'] = 'completed'
         GLOBAL_DATA[gene_id]['fitness'] = fitness
