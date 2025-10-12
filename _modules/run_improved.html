@@ -695,10 +695,9 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">results_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">results</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-        <span class="n">fitness</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
-        <span class="c1"># TODO: get all features later</span>
-        <span class="n">fitness</span> <span class="o">=</span> <span class="p">[</span><span class="n">fitness</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fitness</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">fitness</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())]</span>  <span class="c1"># Only take first value</span>
         <span class="n">fitness</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>
+
         
         <span class="n">GLOBAL_DATA</span><span class="p">[</span><span class="n">gene_id</span><span class="p">][</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;completed&#39;</span>
         <span class="n">GLOBAL_DATA</span><span class="p">[</span><span class="n">gene_id</span><span class="p">][</span><span class="s1">&#39;fitness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitness</span>
