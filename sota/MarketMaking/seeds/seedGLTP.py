@@ -58,6 +58,7 @@ def compute_coeff(xi, gamma, delta, A, k):
     c2 = np.sqrt(np.divide(gamma, 2 * A * delta * k) * ((1 + xi * delta * inv_k) ** (k / (xi * delta) + 1)))
     return c1, c2
 
+# --OPTION--
 @njit
 def glft_market_maker(hbt, recorder):
     tick_size = hbt.depth(0).tick_size

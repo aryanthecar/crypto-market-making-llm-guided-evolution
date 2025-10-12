@@ -33,6 +33,7 @@ def linear_regression(x, y):
     intercept = (sy - slope * sx) / w
     return slope, intercept
 
+# --OPTION--
 @njit
 def as_market_maker(hbt, recorder):
     """

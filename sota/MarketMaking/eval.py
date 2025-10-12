@@ -305,24 +305,50 @@ def main():
         f.write(f"{fitness:.8f}")
     
     logger.info(f"Fitness score saved to: {fitness_filename}")
-    
-    # Generate and save plots
-    try:
-        import matplotlib
-        matplotlib.use('Agg')  # Non-interactive backend
-        import matplotlib.pyplot as plt
-        
-        plot_filename = pj(save_dir, f'{gene_id}_equity_curve.png')
-        stats.plot()
-        plt.savefig(plot_filename, dpi=150, bbox_inches='tight')
-        plt.close()
-        logger.info(f"Equity curve saved to: {plot_filename}")
-    except Exception as e:
-        logger.warning(f"Could not generate plot: {e}")
-    
     logger.info("="*80)
     logger.info("EVALUATION COMPLETE")
     logger.info("="*80)
+
+
+    results_text = f"{fitness:.8f}"
+
+    """
+    This line formats the results into comma-separated string
+    fp_count: Number of false positives.
+    fn_count: Number of false negatives.
+    """
+
+    # Define Output Filename
+    """
+    Defines an Output Filename
+    gene_id is a unique identifier for the experiment or model.
+    """
+    filename = os.path.abspath(f'results/{gene_id}_results.txt')
+    
+    dir_path = os.path.dirname(filename)
+
+    # Create the directory, ignore error if it already exists
+    os.makedirs(dir_path, exist_ok=True)
+
+    """
+    os.path.dirname(filename) extracts the directory path from the filename.
+    os.makedirs(dir_path, exist_ok=True) creates the directory if it does not already exist. 
+    The exist_ok=True parameter ensures that no error is raised if the directory already exists.
+    """
+
+    # Open the file in write mode and write the text
+    with open(filename, 'w') as file:
+        file.write(results_text)
+    """
+    This block opens the specified file in write mode ('w').
+    If the file does not exist, it will be created.
+    The results_text string is written to the file.
+    """
+
+    print(f"results have been written to {filename}")
+
+    print('='*120);print('job done');print('='*120)
+
     
     return fitness, metrics
 
