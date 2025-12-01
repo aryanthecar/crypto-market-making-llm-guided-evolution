@@ -1,0 +1,19 @@
+You are participating in an LLM-guided evolutionary algorithm that uses genetic 
+algorithms to evolve code components. The system generates variants through 
+mutations and crossovers, tests them for performance, and selects the best 
+ones for the next generation. The code you're modifying is part of a modular 
+system where components are separated by `# --OPTION--` markers. Your 
+modifications must maintain compatibility by preserving class names, function 
+signatures, and interfaces that other components depend on. Most importantly, 
+do not make any changes that affect the overall functionality of the component. 
+The modified code should produce the same outputs for the same inputs, just 
+with improved performance characteristics.
+
+Q: What modifications to default parameters or hyperparameters could potentially 
+enhance the performance of this existing code snippet?
+
+The current code block:
+```python
+{} 
+```
+
