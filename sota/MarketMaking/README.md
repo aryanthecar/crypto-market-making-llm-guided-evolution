@@ -5,7 +5,7 @@ The goal of this module is to evaluate market-making strategies (seeds or evolve
 
 ---
 
-## 📁 Folder Structure
+## Folder Structure
 
 ```
 MarketMaking/
@@ -25,7 +25,7 @@ MarketMaking/
 
 ---
 
-## 🚀 Running an HFT Backtest
+## Running an HFT Backtest
 
 `eval.py` is the main script used to evaluate a strategy.  
 It loads data, runs the strategy in an HFT simulation, and outputs both metrics and a fitness score.
@@ -77,7 +77,7 @@ python eval.py --model model_12345 --variant_dir models
 
 ---
 
-## ⚙️ Backtest Configuration
+## Backtest Configuration
 
 Inside `eval.py`, you can configure:
 
@@ -101,7 +101,7 @@ INITIAL_BALANCE = 10000.0
 
 ---
 
-## 📊 Output & Saved Results
+## Output & Saved Results
 
 Every evaluation automatically creates:
 
@@ -125,7 +125,7 @@ Metrics include:
 
 ---
 
-## 🧬 Adding a New Seed Model
+## Adding a New Seed Model
 
 To create a new market-making strategy:
 
@@ -169,7 +169,7 @@ Use this notebook to:
 
 ---
 
-## 🧩 How This Fits Into LLM-Guided Evolution
+## How This Fits Into LLM-Guided Evolution
 
 1. Seed models in `seeds/` are used as **base strategies**.  
 2. The evolutionary system mutates & crosses them to create new variants in `models/`.  
@@ -198,7 +198,7 @@ Some modules (e.g., `hftbacktest`) may require local installation depending on t
 
 ---
 
-## ❗ Troubleshooting
+## Troubleshooting
 
 **Data file not found:**  
 Make sure `.npz` files are stored in `sota/MarketMaking/data/` or update `DATA_FILES` accordingly.
@@ -214,7 +214,7 @@ recorder = Recorder(1, 5_000_000)
 
 ---
 
-## 📣 Maintainers
+## Maintainers
 
 Document maintained by  
 **EMADE VIP – Crypto Team**  
