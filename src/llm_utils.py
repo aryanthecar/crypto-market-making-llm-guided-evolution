@@ -160,8 +160,21 @@ def llm_code_qc_hf(code_from_llm, base_code, generate_text=None):
     box_print("QC PROMPT TO LLM", print_bbox_len=120, new_line_end=False)
     print(prompt2llm)
     
-    code_from_llm = submit_mixtral_local(prompt2llm, max_new_tokens=1500, top_p=0.1, temperature=0.1, 
-                      model_id="mistralai/Mixtral-8x7B-v0.1", return_gen=False)
+    # Use the same LLM model as configured for main generation
+    if LLM_MODEL == 'mixtral' or LLM_MODEL == 'llama3.3':
+        code_from_llm = submit_mixtral_local(prompt2llm, max_new_tokens=1500, top_p=0.1, temperature=0.1, 
+                          model_id="mistralai/Mixtral-8x7B-v0.1", return_gen=False)
+    elif LLM_MODEL == 'llama3':
+        code_from_llm = submit_llama3_hf(prompt2llm, max_new_tokens=1500, top_p=0.1, temperature=0.1, return_gen=False)
+    elif LLM_MODEL == 'gemini':
+        code_from_llm = submit_gemini_api(prompt2llm, top_p=0.1, temperature=0.1)
+    elif LLM_MODEL == 'deepseek':
+        code_from_llm = submit_deepseek_local(prompt2llm, max_new_tokens=1500, top_p=0.1, temperature=0.1, return_gen=False)
+    else:
+        # Fallback to mixtral_local if unknown model
+        code_from_llm = submit_mixtral_local(prompt2llm, max_new_tokens=1500, top_p=0.1, temperature=0.1, 
+                          model_id="mistralai/Mixtral-8x7B-v0.1", return_gen=False)
+    
     box_print("TEXT FROM LLM", print_bbox_len=60, new_line_end=False)
     print(code_from_llm)
     code_from_llm = clean_code_from_llm(code_from_llm)
@@ -403,12 +416,15 @@ def submit_gemini_api(txt2gemini, **kwargs):
     str
         Model's output from inference
     """   
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "INSERT_KEY_HERE_FOR_LOCAL_USE")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "Insert here")
     # add 10 second delay for rate limiting
-    time.sleep(5)
+    # random int betwen 3-10 seconds
+    models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    model = np.random.choice(models)
+    time.sleep(np.random.randint(3, 11))
     client = genai.Client(api_key=GEMINI_API_KEY)
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model=model,
         contents=[txt2gemini],
         
     )

@@ -20,16 +20,16 @@ OUTPUT_DIR = "titanic_test"
 PORT=8137
 
 CLUSTER = "pace-ice"
-LLM_MODEL = 'gemini' # change to llama3.3 for local development
+LLM_MODEL = 'llama3.3' # change to llama3.3 for local development
 ENVIRONMENT_DIR = os.path.join(ROOT_DIR, ".venv")
 SLURM_CONFIG_DIR = os.path.join(ROOT_DIR, "slurm-config/")
-LOCAL_LLM = False # change to True for local development
+LOCAL_LLM = True # change to True for local development
 HOSTNAME_DIR = os.path.join(ROOT_DIR, "hostname.log")
 
 QC_CHECK_BOOL = False
 HUGGING_FACE_BOOL = False
 INFERENCE_SUBMISSION = True
-CUF_TIMEOUT = 20000
+CUF_TIMEOUT = 1200  # 20 minutes
 
 LOCAL = False
 if LOCAL:
@@ -66,15 +66,18 @@ NUM_EOT_ELITES = 10
 GENERATION = 0
 PROB_QC = 0.0
 PROB_EOT = 0.25
-num_generations = 100 # Number of generations
-start_population_size = 128  # Starting population size
+num_generations = 20 # Number of generations
+start_population_size = 20  # Starting population size
 # start_population_size = 144   # Size of the population 124=72
 #population_size = 44 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
-population_size = 128 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
+population_size = 20  # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
 crossover_probability = 0.35  # Probability of mating two individuals
-mutation_probability = 0.8 # Probability of mutating an individual
+mutation_probability = 0.6 # Probability of mutating an individual
 num_elites = 100
 hof_size = 300
+# Multiple seeds configuration
+USE_MULTIPLE_SEEDS = True  # Set to True to use multiple seeds, False to use single seed
+INDIVIDUALS_PER_SEED = 5  # Number of individuals to create from each seed file
 """
 Misc. Non-sense
 """

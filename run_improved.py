@@ -51,6 +51,11 @@ def update_ancestry(gene_id_child, gene_id_parent, ancestry, mutation_type=None,
     dict
         Ancestry dictionary
     """
+    # Check if parent exists in ancestry (if not, it's a seed file)
+    if gene_id_parent not in ancestry:
+        # Initialize ancestry for seed file parent
+        ancestry[gene_id_parent] = {'GENES': [gene_id_parent], 'MUTATE_TYPE': ['SEED']}
+    
     # Common part for both functionalities
     ancestry[gene_id_child] = copy.deepcopy(ancestry[gene_id_parent])
     # Handle the specifics for either part 1 or part 2
@@ -59,7 +64,9 @@ def update_ancestry(gene_id_child, gene_id_parent, ancestry, mutation_type=None,
         ancestry[gene_id_child]['GENES'] = copy.deepcopy(ancestry[gene_id_parent]['GENES']) + [gene_id_child]
         ancestry[gene_id_child]['MUTATE_TYPE'] = copy.deepcopy(ancestry[gene_id_parent]['MUTATE_TYPE']) + [mutation_type]
     else:
-        # Part 2 functionality
+        # Part 2 functionality - also check if parent2 exists
+        if gene_id_parent2 not in ancestry:
+            ancestry[gene_id_parent2] = {'GENES': [gene_id_parent2], 'MUTATE_TYPE': ['SEED']}
         cross_id = f'P:{gene_id_parent2}-C:{gene_id_child}'
         ancestry[gene_id_child]['GENES'] = copy.deepcopy(ancestry[gene_id_parent]['GENES']) + [cross_id]
         ancestry[gene_id_child]['MUTATE_TYPE'] = copy.deepcopy(ancestry[gene_id_parent]['MUTATE_TYPE']) + ["CrossOver"]
@@ -275,17 +282,20 @@ def generate_random_string(length=20):
     random_string = 'xXx'+random_string
     return random_string
 
-def create_individual(container, temp_min=0.05, temp_max=0.4):
+def create_individual(container, seed_network=None, temp_min=0.05, temp_max=0.4):
     box_print("Create Individual", print_bbox_len=60, new_line_end=False)
     out_dir = os.path.join(OUTPUT_DIR, str(GENERATION))
     config = load_yaml()
     gene_id = generate_random_string(length=24)
     # Select prompte and temp
     temperature = round(random.uniform(temp_min, temp_max), 2)
+    # Use provided seed_network or fall back to global SEED_NETWORK
+    if seed_network is None:
+        seed_network = SEED_NETWORK
     # Assign a file path and name for the model creation bash
     file_path = os.path.join(out_dir, f'{gene_id}.sh')
     successful_sub_flag, job_id, local_output = submit_bash(file_path, 
-                                            input_filename_x=f'{SEED_NETWORK}',
+                                            input_filename_x=f'{seed_network}',
                                             output_filename =f'{VARIANT_DIR}/{MODEL}_{gene_id}.py',
                                             gpu=config.get("LLM_GPU"),
                                             python_file='src/llm_mutation.py', 
@@ -414,10 +424,10 @@ def check4results(gene_id):
         with open(results_path, 'r') as file:
             results = file.read()
         results = results.split(',')
-        fitness = [float(results[0].strip())]  # Only take first value
+        fitness = [float(r.strip()) for r in results]
+        # TODO: get all features later
+        fitness = [fitness[0], fitness[1]]
         fitness = tuple(fitness)
-
-        
         GLOBAL_DATA[gene_id]['status'] = 'completed'
         GLOBAL_DATA[gene_id]['fitness'] = fitness
         # print(f'Model from Gene: {gene_id} Evaluated')
@@ -454,6 +464,11 @@ def check_and_update_fitness(population, timeout=CUF_TIMEOUT, loop_delay=60):
             if gene_id not in GLOBAL_DATA:
                 GLOBAL_DATA[gene_id] = {'sub_flag':False, 'job_id':'None', 'status':'completed', 
                                         'fitness':INVALID_FITNESS_MAX, 'start_time':time.time()}
+            # add timeout functionality
+            if count > 10:
+                print(f"LLM Failed for Gene: {gene_id}")
+                ind.fitness.values = INVALID_FITNESS_MAX 
+                GLOBAL_DATA[gene_id]['status'] = 'completed'
             
             if GLOBAL_DATA[gene_id]['sub_flag']==False:
                 ind.fitness.values = INVALID_FITNESS_MAX # Max error
@@ -807,14 +822,82 @@ def true_nsga2(pop, k):
     new_pop = tools.selTournamentDCD(pop, k) # mults of 4
     return new_pop
 
+def get_seed_files(seeds_dir=None):
+    """
+    Get all seed files from the seeds directory.
+    
+    Parameters
+    ----------
+    seeds_dir : str, optional
+        Directory containing seed files. If None, uses SOTA_ROOT/seeds
+    
+    Returns
+    -------
+    list
+        List of full paths to seed files
+    """
+    if seeds_dir is None:
+        seeds_dir = os.path.join(SOTA_ROOT, 'seeds')
+    
+    # Get all Python files in the seeds directory
+    seed_files = glob.glob(os.path.join(seeds_dir, 'seed*.py'))
+    seed_files = [f for f in seed_files if os.path.isfile(f)]
+    seed_files.sort()  # Sort for consistent ordering
+    
+    if not seed_files:
+        # Fall back to single seed if no seeds found
+        print(f"Warning: No seed files found in {seeds_dir}, using default SEED_NETWORK")
+        return [SEED_NETWORK]
+    
+    return seed_files
+
 # Error Handling 
 def createPopulation():
-    start_gen = 0
-    box_print("CREATING POPULATION FROM SEED CODE")
-    population = toolbox.population(n=start_population_size)
+    """Create a population, using multiple seeds if configured."""
+    if USE_MULTIPLE_SEEDS:
+        return createPopulationFromMultipleSeeds(individuals_per_seed=INDIVIDUALS_PER_SEED)
+    else:
+        start_gen = 0
+        box_print("CREATING POPULATION FROM SEED CODE")
+        population = toolbox.population(n=start_population_size)
+        box_print("Batch Checking Created Genes", print_bbox_len=60, new_line_end=False)
+        delayed_creation_check(population)
+        return population
+
+def createPopulationFromMultipleSeeds(individuals_per_seed=4):
+    """
+    Create a population from multiple seed files, with a specified number
+    of individuals from each seed.
+    
+    Parameters
+    ----------
+    individuals_per_seed : int
+        Number of individuals to create from each seed file
+    
+    Returns
+    -------
+    list
+        Population of individuals
+    """
+    seed_files = get_seed_files()
+    population = []
+    
+    box_print(f"CREATING POPULATION FROM {len(seed_files)} SEED FILES")
+    print(f"Creating {individuals_per_seed} individuals from each seed", flush=True)
+    
+    for seed_file in seed_files:
+        seed_name = os.path.basename(seed_file)
+        print(f"\nUsing seed: {seed_name}", flush=True)
+        for i in range(individuals_per_seed):
+            # Create individual using the specific seed
+            individual = create_individual(creator.Individual, seed_network=seed_file)
+            population.append(individual)
+            print(f"  Created individual {i+1}/{individuals_per_seed} from {seed_name}", flush=True)
+    
     box_print("Batch Checking Created Genes", print_bbox_len=60, new_line_end=False)
     delayed_creation_check(population)
-    hof = tools.ParetoFront()
+    
+    return population
 
 # Define the problem
 creator.create("FitnessMulti", base.Fitness, weights=FITNESS_WEIGHTS)  # Adjust weights as needed
@@ -864,10 +947,13 @@ if __name__ == "__main__":
     else:
         # Create an initial population
         start_gen = 0
-        box_print("CREATING POPULATION FROM SEED CODE")
-        population = toolbox.population(n=start_population_size)
-        box_print("Batch Checking Created Genes", print_bbox_len=60, new_line_end=False)
-        delayed_creation_check(population)
+        if USE_MULTIPLE_SEEDS:
+            population = createPopulationFromMultipleSeeds(individuals_per_seed=INDIVIDUALS_PER_SEED)
+        else:
+            box_print("CREATING POPULATION FROM SEED CODE")
+            population = toolbox.population(n=start_population_size)
+            box_print("Batch Checking Created Genes", print_bbox_len=60, new_line_end=False)
+            delayed_creation_check(population)
         hof = tools.ParetoFront()
 
     # Evaluate the entire population
@@ -894,7 +980,7 @@ if __name__ == "__main__":
         count = 0
         for i in range(5):
             if len(population) == 0:
-                createPopulation()
+                population = createPopulation()
             else:
                 break
 

@@ -29,7 +29,7 @@ HOSTNAME_DIR = os.path.join(ROOT_DIR, "hostname.log")
 QC_CHECK_BOOL = False
 HUGGING_FACE_BOOL = False
 INFERENCE_SUBMISSION = True # should I be setting this to False
-CUF_TIMEOUT = 20000
+CUF_TIMEOUT = 600
 
 LOCAL = False
 if LOCAL:
@@ -59,22 +59,25 @@ EVAL_RUNLINE = "uv run python {} --model {} --variant_dir {VARIANT_DIR}"
 """
 Evolution Constants/Params
 """
-FITNESS_WEIGHTS = (1.0,)  # Single fitness value since eval.py combines ROI and Sharpe internally
+FITNESS_WEIGHTS = (1.0, -1.0)  # Single fitness value since eval.py combines ROI and Sharpe internally
 INVALID_FITNESS_MAX = tuple([float(x*np.inf*-1) for x in FITNESS_WEIGHTS])
 PLACEHOLDER_FITNESS = tuple([int(x*9999999999*-1) for x in FITNESS_WEIGHTS])
 NUM_EOT_ELITES = 2
 GENERATION = 0
 PROB_QC = 0.0
 PROB_EOT = 0.25
-num_generations = 3 # Number of generations
-start_population_size = 5  # Starting population size
+num_generations = 10 # Number of generations
+start_population_size = 12  # Starting population size
 # start_population_size = 144   # Size of the population 124=72
 #population_size = 44 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
-population_size = 5 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
-crossover_probability = 0.35  # Probability of mating two individuals
-mutation_probability = 0.8 # Probability of mutating an individual
-num_elites = 2
+population_size = 12 # with cx_prob (0.25) and mute_prob (0.7) you get about %50 successful turnover
+crossover_probability = 0.25  # Probability of mating two individuals
+mutation_probability = 0.6 # Probability of mutating an individual
+num_elites = 4
 hof_size = 4
+# Multiple seeds configuration
+USE_MULTIPLE_SEEDS = True  # Set to True to use multiple seeds, False to use single seed
+INDIVIDUALS_PER_SEED = 3  # Number of individuals to create from each seed file
 
 DNA_TXT = """
 ⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

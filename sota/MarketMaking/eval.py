@@ -116,7 +116,7 @@ def calculate_fitness(stats, roi_weight=ROI_WEIGHT, sharpe_weight=SHARPE_WEIGHT)
     sharpe_normalized = (sharpe_normalized + 1) / 2
     
     # Calculate weighted fitness
-    fitness = roi_weight * roi_normalized + sharpe_weight * sharpe_normalized
+    fitness = [roi, max_drawdown]
     
     # Calculate equity values
     initial_equity = INITIAL_BALANCE
@@ -267,7 +267,6 @@ def main():
     logger.info("BACKTEST RESULTS")
     logger.info("="*80)
     logger.info(f"Gene ID: {gene_id}")
-    logger.info(f"Fitness Score: {fitness:.6f}")
     logger.info(f"ROI: {metrics['roi']:.2f}%")
     logger.info(f"Sharpe Ratio: {metrics['sharpe']:.4f}")
     logger.info(f"Sortino Ratio: {metrics['sortino']:.4f}")
@@ -299,18 +298,13 @@ def main():
     
     logger.info(f"Detailed statistics saved to: {stats_filename}")
     
-    # Save fitness score in simplified format (for genetic algorithm)
-    fitness_filename = pj(save_dir, f'{gene_id}_fitness.txt')
-    with open(fitness_filename, 'w') as f:
-        f.write(f"{fitness:.8f}")
-    
-    logger.info(f"Fitness score saved to: {fitness_filename}")
-    logger.info("="*80)
-    logger.info("EVALUATION COMPLETE")
-    logger.info("="*80)
+    roi = fitness[0]
+    mD = fitness[1]
 
 
-    results_text = f"{fitness:.8f}"
+
+    results_text = f"{roi:.4f},{mD:.4f}"
+
 
     """
     This line formats the results into comma-separated string
