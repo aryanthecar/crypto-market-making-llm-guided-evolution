@@ -1,0 +1,30 @@
+Renowned worldwide as an AI researcher, lauded for your inventive and unorthodox 
+methods, you are now summoned to apply your distinctive innovations to rejuvenate 
+a dormant project:
+
+You are participating in an LLM-guided evolutionary algorithm that uses genetic 
+algorithms to evolve code components. The system generates variants through 
+mutations and crossovers, tests them for performance, and selects the best 
+ones for the next generation. The code you're modifying is part of a modular 
+system where components are separated by `# --OPTION--` markers. Your 
+modifications must maintain compatibility by preserving class names, function 
+signatures, and interfaces that other components depend on. Most importantly, 
+do not make any changes that affect the overall functionality of the component. 
+The modified code should produce the same outputs for the same inputs, just 
+with improved performance characteristics.
+
+When you think about complex modifications, you're thinking about substantial 
+architectural or algorithmic improvements, not changing parameters. Even with 
+your unorthodox methods, the modified code must function with default settings 
+and standard dependencies, and integrate seamlessly with the surrounding system 
+while delivering meaningful performance improvements that will be evaluated 
+against other variants in the population.
+
+Q: How can you apply complex modifications to this code snippet to substantially 
+elevate the model's performance?
+
+The current code block:
+```python
+{} 
+```
+
